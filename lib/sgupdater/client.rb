@@ -1,4 +1,5 @@
 require 'aws-sdk'
+require 'sgupdater/updater'
 
 module Sgupdater
   class Client
@@ -18,7 +19,12 @@ module Sgupdater
       security_groups_with_cidr(cidr).each {|sg| put_perms(sg, cidr)}
     end
 
-    private
+    def update
+      updater = Sgupdater::Updater.new(@cli_options)
+      updater.replace(@cli_options[:from_cidr], @cli_options[:to_cidr])
+      updater.update
+    end
+
     def security_groups_with_cidr(cidr)
       @ec2.security_groups(
         filters: [
@@ -30,7 +36,7 @@ module Sgupdater
     def put_perms(sg, cidr)
       sg.ip_permissions.each do |perm|
         perm.ip_ranges.select {|ip| ip.values.include? cidr}.each do
-          puts [sg.vpc_id, sg.group_id, sg.group_name, perm.from_port, perm.to_port].join("\t")
+          puts [sg.vpc_id, sg.group_id, sg.group_name, perm.from_port, perm.to_port, cidr].join("\t")
         end
       end
     end

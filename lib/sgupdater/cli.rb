@@ -17,7 +17,12 @@ module Sgupdater
     method_option :from_cidr, type: :string, required: true
     method_option :to_cidr, type: :string, required: true
     def update
-      client.update
+      updated = client.update
+      if updated
+        puts "Update success"
+      else
+        puts "No change"
+      end
     end
 
     private

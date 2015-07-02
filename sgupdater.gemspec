@@ -30,4 +30,5 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'aws-sdk', '~> 2.0'
   spec.add_dependency 'thor'
   spec.add_dependency 'thor-aws'
+  spec.add_dependency 'piculet', '= 0.2.8'
 end
