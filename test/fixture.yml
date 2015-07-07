@@ -1,0 +1,9 @@
+---
+security_group:
+  group_name: 'sgupdate-test1'
+  ip_permissions:
+    - ip_protocol: 'tcp'
+      from_port: 1027
+      to_port: 1028
+      cidr_ip:
+        - '192.0.2.0/24'
