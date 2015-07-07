@@ -3,12 +3,10 @@
 # This file is AWS configuration settings file for testing environment.
 
 region:                 'us-west-1'
+vpc_id:                 'vpc-xxxxxxxx'
 
 # Prefer access key id than profile
 credentials:
     profile:            'AWS shared credantials profile name'
     access_key_id:      'Your AWS access key id'
     secret_access_key:  'Your AWS secret access key'
-
-security_groups:
-    prefix:             'sgupdater-'
