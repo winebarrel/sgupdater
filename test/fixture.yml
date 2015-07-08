@@ -1,9 +1,29 @@
 ---
-security_group:
-  group_name: 'sgupdate-test1'
-  ip_permissions:
-    - ip_protocol: 'tcp'
-      from_port: 1027
-      to_port: 1028
-      cidr_ip:
-        - '192.0.2.0/24'
+# security group fixture
+security_groups:
+  - group_name: 'sgupdate-test1'
+    description: 'single source, single port'
+    ip_permissions:
+      - ip_protocol: 'tcp'
+        from_port: 1027
+        to_port: 1027
+        cidr_ip:
+          - '192.0.2.0/24'
+  - group_name: 'sgupdate-test2'
+    description: 'multiple source, multiple port, VPC'
+    ip_permissions:
+      - ip_protocol: 'tcp'
+        from_port: 1027
+        to_port: 1028
+        cidr_ip:
+          - '192.0.2.0/24'
+          - '10.0.0.0/16'
+  - group_name: 'sgupdate-test3'
+    description: 'multiple source, multiple port'
+    ip_permissions:
+      - ip_protocol: 'tcp'
+        from_port: 1027
+        to_port: 1028
+        cidr_ip:
+          - '192.0.2.0/24'
+          - '10.0.0.0/16'
