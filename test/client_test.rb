@@ -2,6 +2,8 @@ require_relative 'helper'
 require 'test/unit'
 require 'aws-sdk'
 require 'yaml'
+require 'sgupdater'
+require 'sgupdater/client'
 
 class TestClient < Test::Unit::TestCase
   extend Sgupdater::TestHelper
@@ -22,6 +24,9 @@ class TestClient < Test::Unit::TestCase
   # 毎回テスト実行前に呼ばれる
   def setup
     TestClient::setup_security_groups(@@ec2, @@config['vpc_id'], @@fixture)
+    cli_options = {from_cidr: '192.0.2.0/24'}
+    aws_config = {region: @@config['region'], credentials: @@cred}
+    @client = Sgupdater::Client.new(cli_options, aws_config)
   end
 
   # テストがpassedになっている場合に、テスト実行後に呼ばれる。テスト後の状態確認とかに使える。
@@ -34,5 +39,6 @@ class TestClient < Test::Unit::TestCase
   end
 
   def test_show
+    @client.show
   end
 end
