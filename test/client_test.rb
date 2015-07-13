@@ -38,7 +38,7 @@ class TestClient < Test::Unit::TestCase
     TestClient::cleanup_security_groups(@@ec2, @@fixture)
   end
 
-  def test_show
+  def test_get
     @client.get.each do |sg|
       assert_equal(@@config['vpc_id'], sg.vpc_id)
 
