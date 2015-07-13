@@ -39,8 +39,12 @@ class TestClient < Test::Unit::TestCase
   end
 
   def test_show
-    @client.get.each do |security_group|
-      assert_equal(@@config['vpc_id'], security_group.vpc_id)
+    @client.get.each do |sg|
+      assert_equal(@@config['vpc_id'], sg.vpc_id)
+
+      fx = @@fixture['security_groups'].find {|f| f['group_name'] == sg.group_name}
+      assert_equal(fx['group_name'], sg.group_name)
+      assert_equal(fx['description'], sg.description)
     end
   end
 end
