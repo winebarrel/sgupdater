@@ -9,7 +9,7 @@ module Sgupdater
       @cli_options = cli_options
       @logger ||= Logger.new STDOUT
 
-      aws_configuration[:logger] = Logger.new STDOUT if @cli_options.verbose
+      aws_configuration[:logger] = Logger.new STDOUT if @cli_options[:verbose]
 
       @ec2 = Aws::EC2::Resource.new aws_configuration
     end
