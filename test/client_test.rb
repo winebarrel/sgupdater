@@ -39,6 +39,8 @@ class TestClient < Test::Unit::TestCase
   end
 
   def test_show
-    @client.show
+    @client.get.each do |security_group|
+      assert_equal(@@config['vpc_id'], security_group.vpc_id)
+    end
   end
 end
