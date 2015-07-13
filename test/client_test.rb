@@ -45,6 +45,16 @@ class TestClient < Test::Unit::TestCase
       fx = @@fixture['security_groups'].find {|f| f['group_name'] == sg.group_name}
       assert_equal(fx['group_name'], sg.group_name)
       assert_equal(fx['description'], sg.description)
+
+      sg.ip_permissions.each do |perm|
+        fx_perm = fx['ip_permissions'].find {|i|
+          i['ip_protocol'] == perm.ip_protocol &&
+            i['from_port'] == perm.from_port &&
+            i['to_port'] == perm.to_port &&
+            i['cidr_ip'] == perm.ip_ranges.map(&:cidr_ip)
+        }
+        assert_not_nil(fx_perm)
+      end
     end
   end
 end
