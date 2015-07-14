@@ -1,28 +1,62 @@
 # Sgupdater
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/sgupdater`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+Sgupdater is a tool to update the permissions CIDR of AWS security group.
 
 ## Installation
-
-Add this line to your application's Gemfile:
-
-```ruby
-gem 'sgupdater'
-```
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
 
     $ gem install sgupdater
 
 ## Usage
 
-TODO: Write usage instructions here
+```
+Commands:
+  sgupdater help [COMMAND]                                  # Describe available commands or one specific command
+  sgupdater show --from-cidr=FROM_CIDR                      # Show current permissions
+  sgupdater update --from-cidr=FROM_CIDR --to-cidr=TO_CIDR  # Update cidr address
+
+Options:
+  p, [--profile=PROFILE]                                   # Load credentials by profile name from shared credentials file.
+  k, [--access-key-id=ACCESS_KEY_ID]                       # AWS access key id.
+  s, [--secret-access-key=SECRET_ACCESS_KEY]               # AWS secret access key.
+  r, [--region=REGION]                                     # AWS region.
+      [--shared-credentials-path=SHARED_CREDENTIALS_PATH]  # AWS shared credentials path.
+  v, [--verbose], [--no-verbose]
+```
+
+### Show
+
+    $ sgupdater show --from-cidr 192.0.2.0/24
+    (classic)	sg-deadbeaf	webserver	22	22	192.0.2.0/24
+    (classic)	sg-deadbeaf	webserver	80	80	192.0.2.0/24
+    vpc-deadbeaf	sg-deadbeaf	apiserver	22	22	192.0.2.0/24
+    vpc-deadbeaf	sg-deadbeaf	apiserver	443	443	192.0.2.0/24
+
+### Update
+
+    $ sgupdater update --from-cidr 192.0.2.0/24 --to-cidr 198.51.100.0/24
+    (classic)	sg-deadbeaf	webserver	22	22	192.0.2.0/24
+    (classic)	sg-deadbeaf	webserver	80	80	192.0.2.0/24
+    vpc-deadbeaf	sg-deadbeaf	apiserver	22	22	192.0.2.0/24
+    vpc-deadbeaf	sg-deadbeaf	apiserver	443	443	192.0.2.0/24
+    Update Permission: classic > webserver(ingress) > tcp 22..22
+      authorize 198.51.100.0/24
+      revoke 192.0.2.0/24
+    Update Permission: classic > webserver(ingress) > tcp 80..80
+      authorize 198.51.100.0/24
+      revoke 192.0.2.0/24
+    Update Permission: vpc-deadbeaf > apiserver(ingress) > tcp 22..22
+      authorize 198.51.100.0/24
+      revoke 192.0.2.0/24
+    Update Permission: vpc-deadbeaf > apiserver(ingress) > tcp 443..443
+      authorize 198.51.100.0/24
+      revoke 192.0.2.0/24
+    Update success
+
+    $ sgupdater show --from-cidr 198.51.10.0/24
+    (classic)	sg-deadbeaf	webserver	22	22	198.51.100.0/24
+    (classic)	sg-deadbeaf	webserver	80	80	198.51.100.0/24
+    vpc-deadbeaf	sg-deadbeaf	apiserver	22	22	198.51.10.0/24
+    vpc-deadbeaf	sg-deadbeaf	apiserver	443	443	198.51.10.0/24
 
 ## Development
 
@@ -32,7 +66,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-1. Fork it ( https://github.com/[my-github-username]/sgupdater/fork )
+1. Fork it ( https://github.com/muramasa64/sgupdater/fork )
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
