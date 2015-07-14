@@ -3,9 +3,10 @@ require 'test/unit'
 require 'aws-sdk'
 require 'yaml'
 require 'sgupdater'
-require 'sgupdater/client'
+require 'sgupdater/updater'
+require 'pp'
 
-class TestClient < Test::Unit::TestCase
+class TestUpdater < Test::Unit::TestCase
   extend Sgupdater::TestHelper
   class << self
     # テスト群の実行前に呼ばれる
@@ -23,10 +24,11 @@ class TestClient < Test::Unit::TestCase
 
   # 毎回テスト実行前に呼ばれる
   def setup
-    TestClient::setup_security_groups(@@ec2, @@config['vpc_id'], @@fixture)
-    cli_options = {from_cidr: '192.0.2.0/24'}
+    TestUpdater::setup_security_groups(@@ec2, @@config['vpc_id'], @@fixture)
+    @cli_options = {from_cidr: '192.0.2.0/24', to_cidr: '198.51.100.0/24'}
     aws_config = {region: @@config['region'], credentials: @@cred}
-    @client = Sgupdater::Client.new(cli_options, aws_config)
+    @updater = Sgupdater::Updater.new(aws_config)
+    @client = Sgupdater::Client.new(@cli_options, aws_config)
   end
 
   # テストがpassedになっている場合に、テスト実行後に呼ばれる。テスト後の状態確認とかに使える。
@@ -35,11 +37,27 @@ class TestClient < Test::Unit::TestCase
 
   # 毎回テスト実行後に呼ばれる
   def teardown
-    TestClient::cleanup_security_groups(@@ec2, @@fixture)
+    TestUpdater::cleanup_security_groups(@@ec2, @@fixture)
   end
 
-  def test_get
-    @client.get.each do |sg|
+  def test_update
+    replaced = @updater.replace(@cli_options[:from_cidr], @cli_options[:to_cidr])
+    replaced.each do |vpc, sgs|
+      sgs.each do |sg_id, sg|
+        fx = @@fixture['security_groups'].find {|f| f['group_name'] == sg[:name]}
+        next unless fx
+        assert_equal(fx['group_name'], sg[:name])
+        assert_equal(fx['description'], sg[:description])
+
+        sg[:ingress].each do |perm|
+          assert(perm[:ip_ranges].include?(@cli_options[:to_cidr]))
+          assert(!perm[:ip_ranges].include?(@cli_options[:from_cidr]))
+        end
+      end
+    end
+
+    assert(@updater.update)
+    @client.get(@cli_options[:to_cidr]).each do |sg|
       assert_equal(@@config['vpc_id'], sg.vpc_id)
 
       fx = @@fixture['security_groups'].find {|f| f['group_name'] == sg.group_name}
@@ -48,6 +66,7 @@ class TestClient < Test::Unit::TestCase
 
       sg.ip_permissions.each do |perm|
         fx_perm = fx['ip_permissions'].find {|i|
+          i['cidr_ip'].map! {|ip| ip == @cli_options[:from_cidr] ? @cli_options[:to_cidr] : ip}
           i['ip_protocol'] == perm.ip_protocol &&
             i['from_port'] == perm.from_port &&
             i['to_port'] == perm.to_port &&
@@ -58,3 +77,5 @@ class TestClient < Test::Unit::TestCase
     end
   end
 end
+
+

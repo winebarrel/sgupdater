@@ -1,6 +1,7 @@
 require 'piculet'
 require 'tempfile'
 require 'json'
+require 'aws-sdk-v1'
 
 module Sgupdater
   class Updater
@@ -8,6 +9,7 @@ module Sgupdater
       @options = options.dup
       @options[:without_convert] = true
       @options[:format] = :json
+      AWS.config(@options)
       @client = Piculet::Client.new(@options)
       @exported = @client.export(without_convert: true)
     end
