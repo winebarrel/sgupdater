@@ -14,13 +14,7 @@ module Sgupdater
       @ec2 = Aws::EC2::Resource.new aws_configuration
     end
 
-    def show
-      cidr = @cli_options[:from_cidr]
-      security_groups_with_cidr(cidr).each {|sg| put_perms(sg, cidr)}
-    end
-
-    def get
-      cidr = @cli_options[:from_cidr]
+    def get(cidr = @cli_options[:from_cidr])
       security_groups_with_cidr(cidr)
     end
 
