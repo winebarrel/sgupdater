@@ -2,6 +2,8 @@
 
 Sgupdater is a tool to update the permissions CIDR of AWS security group.
 
+Powerd by [Piculet](http://piculet.codenize.tools/)
+
 ## Installation
 
     $ gem install sgupdater
