@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
 
   spec.summary       = %q{Sgupdater is a tool to update the permissions CIDR of AWS security group.}
   spec.description   = %q{Sgupdater is a tool to update the permissions CIDR of AWS security group.}
-  spec.homepage      = "https://github.com/uramasa64/sgupdater"
+  spec.homepage      = "https://github.com/muramasa64/sgupdater"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
